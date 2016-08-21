@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="data.json"></script> 
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="angular-range-slider.css">
+    <script src="angular-range-slider.min.js"></script>   
+		
+	<style>
+    table {
+      border: 1px solid grey;
+      padding: 5px;
+	  background-color: #f1f1f1;
+    }
+
+    h1{
+      color: blue;
+    }
+    </style>
+</head>
+
+<body ng-app="app" ng-controller="AppController">
+      <table>
+	    <tr>
+	     <td align="right">
+           Languages:&nbsp;
+           <select ng-model="languagesModel" ng-options='x for x in languagesList'>
+		   <option value="">-Please Select-</option>
+           </select>
+		  </td> 
+        </tr>
+		<tr>
+		 <td> <h1>Enclosure:</h1> </td>
+		</tr>
+	    <tr>
+		  <td>		    
+            <div>                 
+                <p>Min: <span id="s1" ng-bind="items0"></span></p>
+                <p>Max: <span id="s2" ng-bind="items1"></span></p>
+				Width:&nbsp;
+                <div range-slider
+                     floor="0"
+                     ceiling="2000"
+                     dragstop="true"
+                     ng-model-low="items0"
+                     ng-model-high="items1">
+			    </div>   
+           </div>
+		  </td>
+		</tr>
+		<tr>
+	     <td>
+           Enclosure:&nbsp; 
+           <select style="width:300px"  ng-model="enclosuresModel" 
+		   ng-options='x.description + "  " + x.effectivewidth for x in enclosuresList'>
+		     <option value="">-Please Select-</option>
+           </select>
+		  </td> 
+        </tr>
+		<tr>
+		  <td><br/></td>
+		</tr>
+		<tr>
+	     <td>
+           Color:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;
+           <select style="width:300px" ng-disabled="!enclosuresModel" ng-model="colorssModel" ng-options='x for x in colorsList'>
+		   <option value="">-Please Select-</option>
+		   <option value="M">Select</option>
+           </select>
+		  </td> 
+        </tr>
+	</table>
+	
+<script>
+   var app = angular.module('app', ['angularRangeSlider']);
+   app.controller('AppController',['$scope', function($s) {
+   //initializing min and max for range slider
+   $s.items0 = 300;
+   $s.items1 = 600;
+   
+   //importing data to enclosurs ddl
+   var mydata = JSON.parse(data);
+   var enclosuresArray = mydata.enclosures;
+      /* filter callback function */
+   function MyFilter(y) {
+   var min = $s.items0;
+   var max = $s.items1;
+    return (y.effectivewidth >= min && y.effectivewidth <= max);
+    }
+   filteredEnclosuresArray = enclosuresArray.filter(MyFilter);
+   $s.enclosuresList = filteredEnclosuresArray;
+	   /* $watch to monitor models in scope for changes */	
+    $s.$watch('items0', function() {
+	  filteredEnclosuresArray = enclosuresArray.filter(MyFilter);
+	  $s.enclosuresList = filteredEnclosuresArray;
+    });
+	
+	$s.$watch('items1', function() {
+	  filteredEnclosuresArray = enclosuresArray.filter(MyFilter);
+	  $s.enclosuresList = filteredEnclosuresArray;
+    });
+	  
+	//importing data to languages ddl
+	var languages = ['English','Deutsch'];
+	$s.languagesList = languages;
+	
+	//importing colorsList
+	var colors = ['Yellow','Green','Red'];
+	$s.colorsList = colors;
+	
+}]);
+
+</script>
+
+</body>
+
+</html>
